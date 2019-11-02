@@ -2,7 +2,11 @@ package com.zipcodewilmington.phone;
 
 import com.zipcodewilmington.exceptions.InvalidPhoneNumberFormatException;
 
+import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static jdk.nashorn.internal.objects.NativeMath.random;
 
 /**
  * Created by leon on 5/1/17.
@@ -20,14 +24,24 @@ public final class PhoneNumberFactory {
      * @return array of randomly generated PhoneNumber objects
      */ //TODO - Implement logic
     public static PhoneNumber[] createRandomPhoneNumberArray(int phoneNumberCount) {
-        return null;
+        PhoneNumber [] numbers1 = new PhoneNumber[phoneNumberCount];
+        for(int i = 0; i < phoneNumberCount; i++)   {
+            numbers1[i] = createRandomPhoneNumber();
+        }
+        return numbers1;
     }
 
     /**
      * @return an instance of PhoneNumber with randomly generated phone number value
      */ //TODO - Implement logic
     public static PhoneNumber createRandomPhoneNumber() {
-        return createPhoneNumberSafely(-1, -1, -1);
+        Random random = new Random();
+
+        int areaCode = 100 + random.nextInt(900);
+        int centralOfficeCod = 100 + random.nextInt(900);
+        int phoneLineCode = 1000 + random.nextInt(9000);
+
+        return createPhoneNumberSafely(areaCode, centralOfficeCod, phoneLineCode);
     }
 
 
@@ -38,7 +52,14 @@ public final class PhoneNumberFactory {
      * @return a new phone number object
      */ //TODO - if input is valid, return respective PhoneNumber object, else return null
     public static PhoneNumber createPhoneNumberSafely(int areaCode, int centralOfficeCode, int phoneLineCode) {
-        return createPhoneNumber(null);
+        String phoneNumConcat = String.format("(%d)-%d-%d", areaCode, centralOfficeCode, phoneLineCode);
+        try {
+            return createPhoneNumber(phoneNumConcat);
+        }
+        catch (InvalidPhoneNumberFormatException e) {
+            logger.info(String.format("%s is not a valid phone number", phoneNumConcat));
+            return null;
+        }
     }
 
     /**
@@ -46,7 +67,9 @@ public final class PhoneNumberFactory {
      * @return a new phone number object
      * @throws InvalidPhoneNumberFormatException - thrown if phoneNumberString does not match acceptable format
      */ // TODO - Add throws statement to method signature
-    public static PhoneNumber createPhoneNumber(String phoneNumberString) {
-        return null;
+    public static PhoneNumber createPhoneNumber(String phoneNumberString) throws InvalidPhoneNumberFormatException{
+        logger.info("Attempting to create a new PhoneNumber object with a value of " + phoneNumberString);
+
+        return new PhoneNumber(phoneNumberString);
     }
 }
